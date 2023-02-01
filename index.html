@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <title>Hernandez_Flores_Juan_Pablo</title>
+        <script>
+        </script>
+    </head>
+    
+    <body>
+        
+        <script type="module">
+            // <script src="./three.js">
+            import * as THREE from './JS/three.module.js';
+            import { OrbitControls } from './JS/OrbitControls.js';
+            import { FontLoader } from './JS/FontLoader.js';
+	        import { TextGeometry } from './JS/TextGeometry.js';
+
+            //Crear Escena y Definir Fondo
+            var Escena = new THREE.Scene(); //Crear Escena
+            var CTexturaFondo = new THREE.TextureLoader(); //Creamos Cargador
+            CTexturaFondo.crossOrigin = "Anonymous";
+            CTexturaFondo.load('./Recursos/ColoresBUAP.jpg', function (TexturaFondo) { //Cargamos Textura
+                Escena.background = TexturaFondo; }); //Definimos la Textura
+    
+            //Crear camara
+            var Camara = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight);
+            Camara.position.set(0,0,15);
+            
+            //Crear Render
+            var Render = new THREE.WebGLRenderer();
+            Render.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(Render.domElement);
+            Render.setPixelRatio(window.devicePixelRatio);
+            Render.shadowMap.enabled = true //Permite Sombras
+    
+            //Controles Camara(Desactivados)
+            var controles = new OrbitControls(Camara, Render.domElement);
+            controles.minDistance = 5;
+            controles.maxDistance = 50;
+    
+            //Crear Luz
+            const luz = new THREE.PointLight(0xFFFFFF,20,90);
+            Escena.add(luz);
+            luz.position.set(0,10,2);
+
+            //Codigo del Logo Buap
+            var Buap = new THREE.Mesh( new THREE.CylinderGeometry(2,2,.01,32,1,false,Math.PI*3/4,Math.PI*2), 
+            new THREE.MeshBasicMaterial(
+            {map : new THREE.TextureLoader().load('./Recursos/Logo.png')}));  
+            function getRandomInt(max) {
+            return Math.floor(Math.random() * max);}   
+            var posicionAleatoria = getRandomInt(4);
+            switch(posicionAleatoria) {
+            case 0:
+                Buap.position.set(-19,9,0);
+                break;
+            case 1:
+                Buap.position.set(19,9,0);
+                break;
+            case 2:
+                Buap.position.set(19,-8,0);
+                break;
+            case 3:
+                Buap.position.set(-19,-8,0);
+                break;   
+            default:
+            Buap.position.set(0,0,0); }
+
+            Buap.rotation.z= Math.PI*.5;
+            Buap.rotation.y= Math.PI*.5;
+            Escena.add(Buap);
+
+            //Codigo Plano
+            var plano = new THREE.Mesh( new THREE.BoxGeometry(200,10,100), 
+            new THREE.MeshPhongMaterial({color: 0x005992}));
+            plano.reciveShadow= true
+            plano.position.set(0,-30,0);
+            plano.castShadow= true;
+            plano.reciveShadow= true;
+            Escena.add(plano);
+
+            //Diccionarios
+            
+            var NumeroAleatorio = getRandomInt(10);
+            
+            const CitasParaTexto = { //Texto para Generar el Modelo 3D
+                0: '"No existe en el mundo nada más \n poderoso que una idea  a la \n que le ha llegado su tiempo." \n                           -Victor Hugo',
+                1: '    "El éxito es fácil de obtener.\n       Lo difícil es merecerlo." \n                           -Albert Camus',
+                2: '"Siempre que te pregunten si\npuedes hacer un trabajo, contesta\nque sí y ponte enseguida a aprender\ncómo se hace." \n                      -Franklin D. Roosevelt',
+                3: '"No conozco ningún otro signo\n de superioridad que la bondad." \n                   -Ludwig Van Beethoven',
+                4: '      "Sabemos lo que somos, \n       pero no sabemos lo que \n       podemos ser." \n                       -William Shakespeare',
+                5: '"Una buena conversación debe\n agotar el tema, no a los\n interlocutores." \n                       -Winston Churchill',
+                6: '"La experiencia no es lo que sucede,\nsino lo que haces con lo que sucede." \n                           -Aldous Huxley',
+                7: '"Si ayudo a una sola \npersona a tener esperanza,\nno habré vivido en vano." \n                           -Martin Luther King ',
+                8: '"Adoro los placeres sencillos;\n son el último refugio de\n los hombres complicados." \n                           -Oscar Wilde ',
+                9: '"No es tan malo como parece.\n Eres más fuerte de lo que crees.\n Confía en mí." \n                           -Grant Morrison',
+            }
+            const CitaTexto = CitasParaTexto[NumeroAleatorio]
+
+            const CitasParaAudio = {//Texto para la correcta Pronunciacion 
+                0: '"No existe en el mundo nada más poderoso que una idea a la que le ha llegado su tiempo."-Victor Hugo',
+                1: '"El éxito es fácil de obtener. Lo difícil es merecerlo."-Albert Camus',
+                2: '"Siempre que te pregunten si puedes hacer un trabajo, contesta que sí y ponte enseguida a aprender cómo se hace."-Franklin D. Roosevelt',
+                3: '"No conozco ningún otro signo de superioridad que la bondad."-Ludwig Van Beethoven',
+                4: '"Sabemos lo que somos, pero no sabemos lo que podemos ser."-William Shakespeare',
+                5: '"Una buena conversación debe agotar el tema, no a los interlocutores."-Winston Churchill',
+                6: '"La experiencia no es lo que sucede, sino lo que haces con lo que sucede."-Aldous Huxley',
+                7: '"Si ayudo a una sola persona a tener esperanza, no habré vivido en vano."-Martin Luther King ',
+                8: '"Adoro los placeres sencillos; son el último refugio de los hombres complicados." -Oscar Wilde',
+                9: '"No es tan malo como parece. Eres más fuerte de lo que crees. Confía en mí." -Grant Morrison',
+            }
+            const CitaAudio = CitasParaAudio[NumeroAleatorio]
+
+            //Codigo Cita
+            var Cita;
+            const loader1 = new FontLoader();
+            loader1.load( './Recursos/GothamBlack.json', function ( GothamBlack ) {
+
+                const Tgeo = new TextGeometry( CitaTexto, {
+                font: GothamBlack,
+		        size: 1.5,
+		        height: 0.5,
+		        curveSegments: 1,
+		        bevelEnabled: true,
+		        bevelThickness: 0,
+		        bevelSize: 0,
+		        bevelOffset: 0,
+		        bevelSegments: 1
+                });
+
+                Cita= new THREE.Mesh(Tgeo,[
+                new THREE.MeshPhongMaterial(),
+                new THREE.MeshPhongMaterial({ color: 0x0a0a0a})   
+                ]);
+
+                Escena.add(Cita);
+                Cita.position.set(-19,3.5,0);
+                Cita.castShadow= true;
+                Cita.reciveShadow= true;
+            });
+
+            //Codigo Sinterizador
+            var msg = new SpeechSynthesisUtterance();
+            msg.text = CitaAudio;
+            window.speechSynthesis.speak(msg);
+
+
+            function Animacion(){//Animacion
+                Buap.rotation.y += Math.PI*.005;//Gira el Logo de la Buap
+
+                requestAnimationFrame(Animacion);//Creamos el Frame
+                Render.render(Escena,Camara);//Se crea Render
+            };
+            Animacion()
+
+        </script>
+    </body>
+</html>
